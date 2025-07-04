@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/home_screen.dart';
+import 'LoginPage.dart';
 
 void main() async {
   // Pastikan binding Flutter sudah siap
@@ -22,10 +23,11 @@ class JedaKosmikApp extends StatelessWidget {
       title: 'JedaKosmik',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        scaffoldBackgroundColor: const Color(0xFF0D1B2A), // Warna Latar Belakang Utama
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      home: const LoginPage(),
     );
   }
 }
