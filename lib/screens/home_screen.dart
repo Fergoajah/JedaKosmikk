@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jedakosmik/screens/detail_screen.dart';
+import 'package:jedakosmik/screens/explore_screen.dart';
+import 'package:jedakosmik/screens/profile_screen.dart';
 import '../api/nasa_api_service.dart';
 import '../models/apod_model.dart';
 import '../models/cme_model.dart';
@@ -14,13 +16,58 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  // Daftar halaman yang akan ditampilkan
+  static const List<Widget> _widgetOptions = <Widget>[
+    HomeContent(), // Konten utama dipisahkan ke widget sendiri
+    ExploreScreen(),
+    ProfileScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0D1B2A),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF1B263B),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.public), label: 'Explore'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        unselectedItemColor: const Color(0xFFE0E1DD).withOpacity(0.7),
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+// Pisahkan konten utama dari HomeScreen untuk kerapian
+class HomeContent extends StatefulWidget {
+  const HomeContent({super.key});
+
+  @override
+  State<HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
   late final NasaApiService apiService;
   late Future<List<ImageLibraryModel>> futureImages;
   late Future<List<CmeModel>> futureCme;
   late Future<List<ApodModel>> futureApod;
   late Future<List<NeoModel>> futureNeo;
-
-  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -57,67 +104,44 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildSectionTitle('Lihat Apa yang terjadi'),
             _buildFeaturedImageSection(),
             const SizedBox(height: 20),
-
             _buildCategorySection<CmeModel>(
               title: 'Kabar Antariksa',
               future: futureCme,
-              itemBuilder:
-                  (item) => _buildTextOnlyCard(
-                    // Menggunakan widget kartu teks
-                    title: 'Laporan Peristiwa',
-                    content: item.note ?? 'Tidak ada catatan.',
-                  ),
+              itemBuilder: (item) => _buildTextOnlyCard(
+                title: 'Laporan Peristiwa',
+                content: item.note ?? 'Tidak ada catatan.',
+              ),
             ),
-
             _buildCategorySection<ApodModel>(
               title: 'Gambar Astronomi Hari Ini',
               future: futureApod,
-              itemBuilder:
-                  (item) =>
-                      _buildSmallCard(title: item.title, imageUrl: item.url),
+              itemBuilder: (item) =>
+                  _buildSmallCard(title: item.title, imageUrl: item.url),
             ),
-
             _buildCategorySection<NeoModel>(
               title: 'Asteroid Mendekat',
               future: futureNeo,
-              itemBuilder:
-                  (item) => _buildSmallCard(
-                    title: item.name,
-                    imageUrl:
-                        'https://s.w-x.co/util/image/w/in-asteroid_2.jpg?v=at&w=1280&h=720',
-                    isHazardous: item.isPotentiallyHazardous,
-                  ),
+              itemBuilder: (item) => _buildSmallCard(
+                title: item.name,
+                imageUrl:
+                    'https://s.w-x.co/util/image/w/in-asteroid_2.jpg?v=at&w=1280&h=720',
+                isHazardous: item.isPotentiallyHazardous,
+              ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF1B263B),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.public), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        unselectedItemColor: const Color(0xFFE0E1DD).withOpacity(0.7),
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
     );
   }
 
- Widget _buildTextOnlyCard({required String title, required String content}) {
+  Widget _buildTextOnlyCard({required String title, required String content}) {
     return Container(
-      width: 180, // Dibuat sedikit lebih lebar
-      height: 150, // Sesuaikan tinggi agar pas
+      width: 180,
+      height: 150,
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1B263B), // Warna latar kartu
+        color: const Color(0xFF1B263B),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -147,8 +171,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // --- Widget Builders ---
 
   Widget _buildCategorySection<T>({
     required String title,
@@ -184,13 +206,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   final item = snapshot.data![index];
                   return GestureDetector(
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailScreen(item: item),
-                          ),
-                        ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailScreen(item: item),
+                      ),
+                    ),
                     child: itemBuilder(item),
                   );
                 },
@@ -203,12 +224,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // **PERBAIKAN ADA DI SINI**
-  // Widget _buildSmallCard sekarang menerima parameter opsional 'subtitle'
   Widget _buildSmallCard({
     required String title,
     required String imageUrl,
-    String? subtitle, // Dibuat opsional
+    String? subtitle,
     bool isHazardous = false,
   }) {
     return Container(
@@ -226,16 +245,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   Image.network(
                     imageUrl,
                     fit: BoxFit.cover,
-                    errorBuilder:
-                        (c, e, s) => Container(
-                          color: const Color(0xFF1B263B),
-                          child: const Center(
-                            child: Icon(
-                              Icons.broken_image,
-                              color: Colors.white30,
-                            ),
-                          ),
+                    errorBuilder: (c, e, s) => Container(
+                      color: const Color(0xFF1B263B),
+                      child: const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.white30,
                         ),
+                      ),
+                    ),
                   ),
                   if (isHazardous)
                     const Positioned(
@@ -261,7 +279,6 @@ class _HomeScreenState extends State<HomeScreen> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          // Tampilkan subtitle hanya jika ada
           if (subtitle != null)
             Text(
               subtitle,
@@ -277,23 +294,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- Widget lainnya (tidak berubah) ---
-
   Widget _buildFeaturedImageSection() {
     return SizedBox(
       height: 180,
       child: FutureBuilder<List<ImageLibraryModel>>(
         future: futureImages,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty)
+          }
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data!.isEmpty) {
             return const Center(
               child: Text(
                 'Gagal memuat gambar',
                 style: TextStyle(color: Colors.white54),
               ),
             );
+          }
           return ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -301,13 +320,12 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               final item = snapshot.data![index];
               return GestureDetector(
-                onTap:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailScreen(item: item),
-                      ),
-                    ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(item: item),
+                  ),
+                ),
                 child: _buildFeaturedCard(
                   title: item.title,
                   imageUrl: item.imageUrl,
@@ -337,14 +355,13 @@ class _HomeScreenState extends State<HomeScreen> {
             Image.network(
               imageUrl,
               fit: BoxFit.cover,
-              errorBuilder:
-                  (c, e, s) => const Center(
-                    child: Icon(
-                      Icons.satellite_alt_rounded,
-                      color: Colors.white30,
-                      size: 50,
-                    ),
-                  ),
+              errorBuilder: (c, e, s) => const Center(
+                child: Icon(
+                  Icons.satellite_alt_rounded,
+                  color: Colors.white30,
+                  size: 50,
+                ),
+              ),
             ),
             Container(
               decoration: BoxDecoration(
