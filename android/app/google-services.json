@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "898674837243",
+    "project_id": "jedakosmik",
+    "storage_bucket": "jedakosmik.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898674837243:android:3637ded52c98a642e5125e",
+        "android_client_info": {
+          "package_name": "com.example.jedakosmik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2moKXQFvRSqbXUXh2vdBJ3z9BqTqOdCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

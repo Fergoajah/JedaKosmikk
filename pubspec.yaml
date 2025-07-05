@@ -20,6 +20,9 @@ dependencies:
 
   # (Pastikan dependensi lain seperti cupertino_icons tetap ada)
   cupertino_icons: ^1.0.2
+  firebase_core: ^3.15.1
+  firebase_auth: ^5.1.2
+
 
 dev_dependencies:
   flutter_test:

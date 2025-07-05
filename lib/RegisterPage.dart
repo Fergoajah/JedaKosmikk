@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
-import 'screens/home_screen.dart';
-import 'RegisterPage.dart';
+import 'screens/home_screen.dart'; // Untuk navigasi setelah berhasil
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  // Instance FirebaseAuth
+class _RegisterPageState extends State<RegisterPage> {
+  // 1. Buat instance FirebaseAuth
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Controller untuk mengambil data dari text field
+  // 2. Controller untuk mengambil teks dari input field
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   bool _isPasswordVisible = false;
 
-  // Fungsi untuk menangani proses login
-  Future<void> _login() async {
+  // 3. Fungsi utama untuk proses registrasi
+  Future<void> _register() async {
     try {
-      // Panggil metode signInWithEmailAndPassword
-      await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      // Panggil metode untuk membuat user baru dengan email dan password
+      await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(), // Ambil email dari controller
+        password: _passwordController.text.trim(), // Ambil password dari controller
       );
 
-      // Jika berhasil, navigasi ke HomeScreen
+      // Jika berhasil, arahkan pengguna ke halaman utama (HomeScreen)
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -37,18 +35,16 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Tangani error dan tampilkan pesan
- print('Firebase Auth Error Code: ${e.code}'); 
-
+      // Tangani jika terjadi error saat registrasi
       String message;
-      // Tangani kode error 'invalid-credential' yang baru
-      if (e.code == 'invalid-credential') {
-        message = 'Email atau password yang Anda masukkan salah.';
+      if (e.code == 'weak-password') {
+        message = 'Password yang Anda masukkan terlalu lemah.';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'Alamat email ini sudah terdaftar.';
       } else {
-        // Tangani error lainnya jika ada
         message = 'Terjadi kesalahan. Silakan coba lagi.';
       }
-
+      // Tampilkan pesan error kepada pengguna
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -60,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // Bersihkan controller saat widget tidak digunakan
   @override
   void dispose() {
     _emailController.dispose();
@@ -69,12 +66,20 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Definisikan warna dari palet
     const Color primaryTextColor = Color(0xFFE0E1DD);
     const Color secondaryTextColor = Color(0xFFE0E1DD);
     const Color buttonColor = Color(0xFF1B263B);
-
+    
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Register'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryTextColor),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -82,9 +87,8 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Judul dan Subjudul
               const Text(
-                'JedaKosmik',
+                'Buat Akun',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 40,
@@ -94,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Ambil Jeda Nikmati Kosmos',
+                'Bergabunglah dengan JedaKosmik',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -103,9 +107,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 60),
 
-              // Kolom Input Email
+              // TextField untuk Email, hubungkan dengan controller
               TextField(
-                controller: _emailController, // Hubungkan controller
+                controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Type Email Here',
@@ -113,26 +117,20 @@ class _LoginPageState extends State<LoginPage> {
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: secondaryTextColor.withOpacity(0.5)),
                   ),
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: primaryTextColor),
-                  ),
                 ),
                 style: const TextStyle(color: primaryTextColor),
               ),
               const SizedBox(height: 24),
 
-              // Kolom Input Password
+              // TextField untuk Password, hubungkan dengan controller
               TextField(
-                controller: _passwordController, // Hubungkan controller
+                controller: _passwordController,
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Type Password Here',
                   labelStyle: TextStyle(color: secondaryTextColor.withOpacity(0.7)),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: secondaryTextColor.withOpacity(0.5)),
-                  ),
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: primaryTextColor),
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -150,34 +148,19 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 48),
 
-              // Tombol Login
+              // Tombol untuk memanggil fungsi _register
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor, // Warna tombol
+                  backgroundColor: buttonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: _login, // Panggil fungsi _login
+                onPressed: _register, // 4. Panggil fungsi registrasi saat ditekan
                 child: const Text(
-                  'Login',
+                  'Register',
                   style: TextStyle(fontSize: 16, color: primaryTextColor),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Teks untuk Register
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()),
-                  );
-                },
-                child: Text(
-                  'Belum ada roket? Register dulu',
-                  style: TextStyle(color: secondaryTextColor.withOpacity(0.8)),
                 ),
               ),
             ],
