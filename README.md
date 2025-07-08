@@ -1,7 +1,7 @@
-### JedaKosmik 🚀
+## JedaKosmik 🚀
 Selamat datang di JedaKosmik! Sebuah aplikasi seluler yang dibuat dengan Flutter untuk menjelajahi keajaiban kosmos. Aplikasi ini menyediakan berbagai informasi dan gambar astronomi yang diambil langsung dari API publik NASA. Pengguna dapat membuat akun, masuk, dan menelusuri alam semesta dari genggaman mereka.
 
-### ✨ Fitur Utama
+## ✨ Fitur Utama
 Autentikasi Pengguna: Sistem pendaftaran dan login yang aman dan mudah menggunakan Firebase Authentication.
 
 Gambar Astronomi Hari Ini (APOD): Menampilkan gambar atau video astronomi pilihan NASA setiap hari, lengkap dengan penjelasan mendetail.
@@ -16,7 +16,7 @@ Antarmuka yang Ramah Pengguna: Desain yang bersih dan intuitif dengan tema luar 
 
 Multiplatform: Dibangun untuk berjalan di Android, iOS, dan platform lainnya yang didukung oleh Flutter.
 
-### 🛠️ Teknologi & API yang Digunakan
+## 🛠️ Teknologi & API yang Digunakan
 Framework: Flutter
 
 Bahasa: Dart
@@ -43,7 +43,7 @@ provider: Untuk state management.
 
 intl: Untuk pemformatan tanggal yang mudah dibaca.
 
-### 🔧 Cara Menjalankan Proyek
+## 🔧 Cara Menjalankan Proyek
 Prasyarat
 Pastikan Anda telah menginstal Flutter SDK.
 
@@ -78,7 +78,7 @@ Jalankan aplikasi:
 
 flutter run
 
-### 📂 Struktur Proyek
+## 📂 Struktur Proyek
 Struktur direktori utama dari proyek ini adalah sebagai berikut:
 
 lib/
