@@ -1,35 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/home_screen.dart';
-import 'RegisterPage.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  // Instance FirebaseAuth
+class _RegisterPageState extends State<RegisterPage> {
+  // Membuat instance dari FirebaseAuth untuk berinteraksi dengan layanan otentikasi Firebase
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Controller untuk mengambil data dari text field
+  // Membuat controller untuk setiap TextField.
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
+  
+  // Variabel boolean untuk mengontrol visibilitas password
   bool _isPasswordVisible = false;
 
-  // Fungsi untuk menangani proses login
-  Future<void> _login() async {
+  // Fungsi asynchronous untuk menangani proses registrasi pengguna baru
+  Future<void> _register() async {
     try {
-      // Panggil metode signInWithEmailAndPassword
-      await _auth.signInWithEmailAndPassword(
+      // Memanggil metode createUserWithEmailAndPassword dari FirebaseAuth
+      // Metode ini akan membuat akun baru di Firebase Authentication
+      // Await digunakan untuk menunggu hasil dari proses async di firebase
+      await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Jika berhasil, navigasi ke HomeScreen
+      // Jika proses pembuatan user berhasil, cek apakah widget masih ada di tree (mounted)
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -37,18 +39,18 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Tangani error dan tampilkan pesan
- print('Firebase Auth Error Code: ${e.code}'); 
-
+      // Blok 'catch' untuk menangani error yang spesifik dari Firebase Auth
       String message;
-      // Tangani kode error 'invalid-credential' yang baru
-      if (e.code == 'invalid-credential') {
-        message = 'Email atau password yang Anda masukkan salah.';
+      // Memeriksa kode error yang dikembalikan oleh Firebase
+      if (e.code == 'weak-password') {
+        message = 'Password yang Anda masukkan terlalu lemah.';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'Alamat email ini sudah terdaftar.';
       } else {
-        // Tangani error lainnya jika ada
         message = 'Terjadi kesalahan. Silakan coba lagi.';
       }
-
+      
+      // Jika widget masih ada, tampilkan pesan error menggunakan SnackBar
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -60,6 +62,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // Metode dispose dipanggil saat widget dihapus dari tree
   @override
   void dispose() {
     _emailController.dispose();
@@ -67,14 +70,29 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // Metode build yang merender UI dari halaman registrasi
   @override
   Widget build(BuildContext context) {
-    // Definisikan warna dari palet
+    // Mendefinisikan warna-warna yang akan digunakan dalam UI
     const Color primaryTextColor = Color(0xFFE0E1DD);
     const Color secondaryTextColor = Color(0xFFE0E1DD);
     const Color buttonColor = Color(0xFF1B263B);
-
+    
+    // Scaffold adalah layout dasar untuk halaman
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Register'),
+        backgroundColor: Colors.transparent,
+        elevation: 0, 
+
+        // Menambahkan tombol back secara manual
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryTextColor),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+
+      // Center menempatkan child-nya di tengah
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -82,9 +100,8 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Judul dan Subjudul
               const Text(
-                'JedaKosmik',
+                'Buat Akun',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 40,
@@ -93,53 +110,52 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 8),
+              // Subjudul
               Text(
-                'Ambil Jeda Nikmati Kosmos',
+                'Bergabunglah dengan JedaKosmik',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
-                  color: secondaryTextColor.withOpacity(0.8),
+                  color: secondaryTextColor.withValues(alpha: 0.8),
                 ),
               ),
               const SizedBox(height: 60),
 
-              // Kolom Input Email
+              // TextField untuk Email
               TextField(
-                controller: _emailController, // Hubungkan controller
+                controller: _emailController, // Menghubungkan dengan controller
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Type Email Here',
-                  labelStyle: TextStyle(color: secondaryTextColor.withOpacity(0.7)),
+                  labelStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.7)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: secondaryTextColor.withOpacity(0.5)),
-                  ),
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: primaryTextColor),
+                    borderSide: BorderSide(color: secondaryTextColor.withValues(alpha: 0.5)),
                   ),
                 ),
                 style: const TextStyle(color: primaryTextColor),
               ),
               const SizedBox(height: 24),
 
-              // Kolom Input Password
+              // TextField untuk Password
               TextField(
-                controller: _passwordController, // Hubungkan controller
+                controller: _passwordController, // Menghubungkan dengan controller
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Type Password Here',
-                  labelStyle: TextStyle(color: secondaryTextColor.withOpacity(0.7)),
+                  labelStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.7)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: secondaryTextColor.withOpacity(0.5)),
+                    borderSide: BorderSide(color: secondaryTextColor.withValues(alpha: 0.5)),
                   ),
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: primaryTextColor),
-                  ),
+
+                  // Ikon untuk menampilkan/menyembunyikan password
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                      color: secondaryTextColor.withOpacity(0.7),
+                      color: secondaryTextColor.withValues(alpha: 0.7),
                     ),
+
                     onPressed: () {
+                      // Mengubah state untuk me-render ulang UI dengan visibilitas password yang baru
                       setState(() {
                         _isPasswordVisible = !_isPasswordVisible;
                       });
@@ -150,34 +166,19 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 48),
 
-              // Tombol Login
+              // Tombol untuk registrasi
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor, // Warna tombol
+                  backgroundColor: buttonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: _login, // Panggil fungsi _login
+                onPressed: _register, // Memanggil fungsi _register saat tombol ditekan
                 child: const Text(
-                  'Login',
+                  'Register',
                   style: TextStyle(fontSize: 16, color: primaryTextColor),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Teks untuk Register
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()),
-                  );
-                },
-                child: Text(
-                  'Belum ada roket? Register dulu',
-                  style: TextStyle(color: secondaryTextColor.withOpacity(0.8)),
                 ),
               ),
             ],

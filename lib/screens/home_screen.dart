@@ -16,15 +16,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Variabel untuk menyimpan indeks tab yang sedang aktif
   int _selectedIndex = 0;
 
   // Daftar halaman yang akan ditampilkan
   static const List<Widget> _widgetOptions = <Widget>[
-    HomeContent(), // Konten utama dipisahkan ke widget sendiri
+    HomeContent(),
     ExploreScreen(),
     ProfileScreen(),
   ];
 
+  // Fungsi yang diapnggil ketika salah satu item tab dipilih
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -36,8 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D1B2A),
       body: Center(
+        // Menampilkan widget dari _widgetOptions sesuai dengan _selectedIndex
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
+      // BottomNavBar untuk menampilkan tab
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF1B263B),
         items: const <BottomNavigationBarItem>[
@@ -47,14 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
-        unselectedItemColor: const Color(0xFFE0E1DD).withOpacity(0.7),
+        unselectedItemColor: const Color(0xFFE0E1DD).withValues(alpha: 0.7),
         onTap: _onItemTapped,
       ),
     );
   }
 }
 
-// Pisahkan konten utama dari HomeScreen untuk kerapian
+// Widget yang berisi konten dari halaman Home
+// dipisahkan agar lebih mudaj ddikelola
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
 
@@ -63,19 +68,22 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
+  // Deklarasi service API dan Future untuk menampung hasil dari API
   late final NasaApiService apiService;
   late Future<List<ImageLibraryModel>> futureImages;
   late Future<List<CmeModel>> futureCme;
   late Future<List<ApodModel>> futureApod;
   late Future<List<NeoModel>> futureNeo;
 
+  // initState dipanggil sekali saat widget pertama kali dibuat
   @override
   void initState() {
     super.initState();
     const String yourNasaApiKey = "GhwQNqtjDGqQAhklmdPTsJNGzjLE74mxUvqSwg0C";
     apiService = NasaApiService(apiKey: yourNasaApiKey);
-
-    futureImages = apiService.searchImages(query: 'nebula');
+    // Memulai proses pengambilan data dari API
+    // Hasilnya disimpan dalam variabel Future
+    futureImages = apiService.searchImages(query: 'perseverance');
     futureCme = apiService.fetchCmeData();
     futureApod = apiService.fetchApods(count: 10);
     futureNeo = apiService.fetchNearEarthObjects();
@@ -101,32 +109,40 @@ class _HomeContentState extends State<HomeContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Lihat Apa yang terjadi'),
+            // Bagian Kabar dari MARS untuk API Images library NASA 
+            _buildSectionTitle('Kabar dari Mars'),
             _buildFeaturedImageSection(),
+
             const SizedBox(height: 20),
+            // Bagian kategori kabar antariksa untuk API CME NASA
             _buildCategorySection<CmeModel>(
               title: 'Kabar Antariksa',
               future: futureCme,
-              itemBuilder: (item) => _buildTextOnlyCard(
-                title: 'Laporan Peristiwa',
-                content: item.note ?? 'Tidak ada catatan.',
-              ),
+              itemBuilder:
+                  (item) => _buildTextOnlyCard(
+                    title: 'Laporan Peristiwa',
+                    content: item.note ?? 'Tidak ada catatan.',
+                  ),
             ),
+            // Bagian kategori Gambar Astronomi Hasi ini untuk API APOD NASA
             _buildCategorySection<ApodModel>(
               title: 'Gambar Astronomi Hari Ini',
               future: futureApod,
-              itemBuilder: (item) =>
-                  _buildSmallCard(title: item.title, imageUrl: item.url),
+              itemBuilder:
+                  (item) =>
+                      _buildSmallCard(title: item.title, imageUrl: item.url),
             ),
+            // Bagian kategori Asteroid untuk API NEO NASA
             _buildCategorySection<NeoModel>(
               title: 'Asteroid Mendekat',
               future: futureNeo,
-              itemBuilder: (item) => _buildSmallCard(
-                title: item.name,
-                imageUrl:
-                    'https://s.w-x.co/util/image/w/in-asteroid_2.jpg?v=at&w=1280&h=720',
-                isHazardous: item.isPotentiallyHazardous,
-              ),
+              itemBuilder:
+                  (item) => _buildSmallCard(
+                    title: item.name,
+                    imageUrl:
+                        'https://s.w-x.co/util/image/w/in-asteroid_2.jpg?v=at&w=1280&h=720',
+                    isHazardous: item.isPotentiallyHazardous,
+                  ),
             ),
           ],
         ),
@@ -134,6 +150,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  // Widget untuk membuat kartu yang hanya berisi teks untuk kategori Kabar Antariksa, namun bisa digunakan oleh kategori manapun jika diperlukan
   Widget _buildTextOnlyCard({required String title, required String content}) {
     return Container(
       width: 180,
@@ -160,7 +177,7 @@ class _HomeContentState extends State<HomeContent> {
             child: Text(
               content,
               style: TextStyle(
-                color: const Color(0xFFE0E1DD).withOpacity(0.8),
+                color: const Color(0xFFE0E1DD).withValues(alpha: 0.8),
                 fontSize: 12,
               ),
               maxLines: 4,
@@ -172,6 +189,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  // Widget generik untuk membuat sebuah section kategori dengan list horizontal
   Widget _buildCategorySection<T>({
     required String title,
     required Future<List<T>> future,
@@ -183,12 +201,15 @@ class _HomeContentState extends State<HomeContent> {
         _buildSectionTitle(title),
         SizedBox(
           height: 150,
+          // FutureBuilder membangun UI berdasarkan state dari sebuah Future
           child: FutureBuilder<List<T>>(
             future: future,
             builder: (context, snapshot) {
+              // Menampilkan indikator loading ketika data sedang diambil
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
+              // Menampilkan pesan error ketika ada error atau tidak ada data
               if (snapshot.hasError ||
                   !snapshot.hasData ||
                   snapshot.data!.isEmpty) {
@@ -199,19 +220,22 @@ class _HomeContentState extends State<HomeContent> {
                   ),
                 );
               }
+              // Jika data berhasil didapat, bangun ListView
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final item = snapshot.data![index];
+                  // GestureDetector untuk membuat item bisa ditekan atau di tap
                   return GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailScreen(item: item),
-                      ),
-                    ),
+                    onTap:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailScreen(item: item),
+                          ),
+                        ),
                     child: itemBuilder(item),
                   );
                 },
@@ -224,11 +248,12 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  // Widget untuk membangun Card kecil dengan gambar dan judul
   Widget _buildSmallCard({
     required String title,
     required String imageUrl,
     String? subtitle,
-    bool isHazardous = false,
+    bool isHazardous = false, // penanda warning untuk asteroid berbahaya
   }) {
     return Container(
       width: 140,
@@ -245,16 +270,18 @@ class _HomeContentState extends State<HomeContent> {
                   Image.network(
                     imageUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => Container(
-                      color: const Color(0xFF1B263B),
-                      child: const Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          color: Colors.white30,
+                    errorBuilder:
+                        (c, e, s) => Container(
+                          color: const Color(0xFF1B263B),
+                          child: const Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              color: Colors.white30,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                   ),
+                  // Menampilkan ikon peringantan jika asteroid berbahaya
                   if (isHazardous)
                     const Positioned(
                       top: 8,
@@ -283,7 +310,7 @@ class _HomeContentState extends State<HomeContent> {
             Text(
               subtitle,
               style: TextStyle(
-                color: const Color(0xFFE0E1DD).withOpacity(0.7),
+                color: const Color(0xFFE0E1DD).withValues(alpha: 0.7),
                 fontSize: 12,
               ),
               maxLines: 1,
@@ -294,6 +321,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  // Widget untuk membangun section gambar unggulana atau bagian paling atas yaitu Kabar dari MARS
   Widget _buildFeaturedImageSection() {
     return SizedBox(
       height: 180,
@@ -316,16 +344,18 @@ class _HomeContentState extends State<HomeContent> {
           return ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
+             // Batasi jumlah item yang ditampilkan untuk performa
             itemCount: snapshot.data!.length > 10 ? 10 : snapshot.data!.length,
             itemBuilder: (context, index) {
               final item = snapshot.data![index];
               return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailScreen(item: item),
-                  ),
-                ),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailScreen(item: item),
+                      ),
+                    ),
                 child: _buildFeaturedCard(
                   title: item.title,
                   imageUrl: item.imageUrl,
@@ -338,6 +368,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  // Widget untuk build CArd besar untuk gambar unggulan
   Widget _buildFeaturedCard({
     required String title,
     String? subtitle,
@@ -355,24 +386,30 @@ class _HomeContentState extends State<HomeContent> {
             Image.network(
               imageUrl,
               fit: BoxFit.cover,
-              errorBuilder: (c, e, s) => const Center(
-                child: Icon(
-                  Icons.satellite_alt_rounded,
-                  color: Colors.white30,
-                  size: 50,
-                ),
-              ),
+              errorBuilder:
+                  (c, e, s) => const Center(
+                    child: Icon(
+                      Icons.satellite_alt_rounded,
+                      color: Colors.white30,
+                      size: 50,
+                    ),
+                  ),
             ),
+            // Gradient hitam di bagian bawah card untuk membuat teks lebih mudah dibaca
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
                   stops: const [0.5, 1.0],
                 ),
               ),
             ),
+            // Posisi teks di bagian bawah kartu
             Positioned(
               bottom: 12,
               left: 12,
@@ -411,6 +448,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  // Widget helper untuk membuat judul section
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
