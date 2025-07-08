@@ -8,7 +8,7 @@
 - 📡 **Data Real-time dari NASA**: Mengambil data dari berbagai API NASA, termasuk APOD, NEO, CME, dan Galeri Gambar.
 - 🧭 **Navigasi Intuitif**: Perpindahan antar halaman yang mudah dengan Bottom Navigation Bar.
 - 🖼️ **Galeri Interaktif**: Tampilan grid untuk galeri gambar yang responsif dengan fitur pencarian.
-- 🧑‍🚀 **Profil Pengguna**: Halaman profil untuk mengelola akun dan melakukan logout.
+- 🧑‍🚀 **Profil Pengguna**: Halaman profil untuk melakukan logout.
 - ⚠️ **Peringatan Asteroid**: Memberikan penanda visual untuk asteroid yang berpotensi berbahaya.
 
 ## 🛠️ Teknologi yang Digunakan
@@ -20,8 +20,6 @@
 - Material Design 3 - Untuk desain antarmuka yang modern.
 
 ## 📸 Screenshot
-
-*Catatan: Ganti placeholder di bawah ini dengan screenshot asli dari aplikasi Anda. Anda bisa menyimpannya di dalam folder `assets/screenshots/` di proyek Anda untuk kerapian.*
 
 | Halaman Login | Halaman Utama | Halaman Explore | Halaman Detail |
 | :---: | :---: | :---: | :---: |
