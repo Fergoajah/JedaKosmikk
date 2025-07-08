@@ -25,7 +25,11 @@
 
 | Halaman Login | Halaman Utama | Halaman Explore | Halaman Detail |
 | :---: | :---: | :---: | :---: |
-| ![Login](https://placehold.co/300x600/0D1B2A/E0E1DD?text=Halaman+Login) | ![Home](https://placehold.co/300x600/0D1B2A/E0E1DD?text=Halaman+Utama) | ![Explore](https://placehold.co/300x600/0D1B2A/E0E1DD?text=Halaman+Explore) | ![Detail](https://placehold.co/300x600/0D1B2A/E0E1DD?text=Halaman+Detail) |
+| ![Screenshot_2025-07-08-10-03-56-266_com example jedakosmik](https://github.com/user-attachments/assets/c17f91a1-6446-41b4-b337-2f132ab1255e)
+ | ![Screenshot_2025-07-08-10-04-55-168_com example jedakosmik](https://github.com/user-attachments/assets/151ba174-f4ea-4d0d-b6b2-639830e68cea)
+ | ![Screenshot_2025-07-08-10-05-28-097_com example jedakosmik](https://github.com/user-attachments/assets/9b525fa6-a70d-40ce-9800-becb5caafa98)
+| ![Screenshot_2025-07-08-10-04-50-453_com example jedakosmik](https://github.com/user-attachments/assets/d8c9db0e-6af6-44de-a3ca-17f3cc88cb6f)
+ |
 
 ## ⚙️ Instalasi dan Konfigurasi
 
