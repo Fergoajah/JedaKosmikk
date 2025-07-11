@@ -16,12 +16,29 @@ class _RegisterPageState extends State<RegisterPage> {
   // Membuat controller untuk setiap TextField.
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   // Variabel boolean untuk mengontrol visibilitas password
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   // Fungsi asynchronous untuk menangani proses registrasi pengguna baru
   Future<void> _register() async {
+    // Validasi konfirmasi password
+    if (_passwordController.text.trim() !=
+        _confirmPasswordController.text.trim()) {
+      // Jika tidak cocok, tampilkan pesan error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password dan konfirmasi password tidak cocok.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+      return; // Hentikan proses registrasi
+    }
+
     try {
       // Memanggil metode createUserWithEmailAndPassword dari FirebaseAuth
       // Metode ini akan membuat akun baru di Firebase Authentication
@@ -49,14 +66,11 @@ class _RegisterPageState extends State<RegisterPage> {
       } else {
         message = 'Terjadi kesalahan. Silakan coba lagi.';
       }
-      
+
       // Jika widget masih ada, tampilkan pesan error menggunakan SnackBar
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.redAccent,
-          ),
+          SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
         );
       }
     }
@@ -67,6 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -77,13 +92,14 @@ class _RegisterPageState extends State<RegisterPage> {
     const Color primaryTextColor = Color(0xFFE0E1DD);
     const Color secondaryTextColor = Color(0xFFE0E1DD);
     const Color buttonColor = Color(0xFF1B263B);
-    
+
     // Scaffold adalah layout dasar untuk halaman
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Register'),
         backgroundColor: Colors.transparent,
-        elevation: 0, 
+        elevation: 0,
 
         // Menambahkan tombol back secara manual
         leading: IconButton(
@@ -127,9 +143,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Type Email Here',
-                  labelStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.7)),
+                  labelStyle: TextStyle(
+                    color: secondaryTextColor.withValues(alpha: 0.7),
+                  ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: secondaryTextColor.withValues(alpha: 0.5)),
+                    borderSide: BorderSide(
+                      color: secondaryTextColor.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
                 style: const TextStyle(color: primaryTextColor),
@@ -138,19 +158,26 @@ class _RegisterPageState extends State<RegisterPage> {
 
               // TextField untuk Password
               TextField(
-                controller: _passwordController, // Menghubungkan dengan controller
+                controller:
+                    _passwordController, // Menghubungkan dengan controller
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Type Password Here',
-                  labelStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.7)),
+                  labelStyle: TextStyle(
+                    color: secondaryTextColor.withValues(alpha: 0.7),
+                  ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: secondaryTextColor.withValues(alpha: 0.5)),
+                    borderSide: BorderSide(
+                      color: secondaryTextColor.withValues(alpha: 0.5),
+                    ),
                   ),
 
                   // Ikon untuk menampilkan/menyembunyikan password
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isPasswordVisible
+                          ? Icons.lightbulb
+                          : Icons.lightbulb_outlined,
                       color: secondaryTextColor.withValues(alpha: 0.7),
                     ),
 
@@ -164,6 +191,34 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 style: const TextStyle(color: primaryTextColor),
               ),
+
+              const SizedBox(height: 24),
+
+              // TextField untuk Konfirmasi Password
+              TextField(
+                controller: _confirmPasswordController,
+                obscureText: !_isConfirmPasswordVisible,
+                decoration: InputDecoration(
+                  labelText: 'Confirm Password Here',
+                  labelStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.7)),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: secondaryTextColor.withValues(alpha: 0.5)),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isConfirmPasswordVisible ? Icons.lightbulb : Icons.lightbulb_outlined,
+                      color: secondaryTextColor.withValues(alpha: 0.7),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                      });
+                    },
+                  ),
+                ),
+                style: const TextStyle(color: primaryTextColor),
+              ),
+
               const SizedBox(height: 48),
 
               // Tombol untuk registrasi
@@ -175,7 +230,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: _register, // Memanggil fungsi _register saat tombol ditekan
+                onPressed:
+                    _register, // Memanggil fungsi _register saat tombol ditekan
                 child: const Text(
                   'Register',
                   style: TextStyle(fontSize: 16, color: primaryTextColor),

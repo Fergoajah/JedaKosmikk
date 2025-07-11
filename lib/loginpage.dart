@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       // Mengubah ikon berdasarkan state _isPasswordVisible
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isPasswordVisible ? Icons.lightbulb : Icons.lightbulb_outline,
                       color: secondaryTextColor.withValues(alpha: 0.7),
                     ),
 
@@ -178,6 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  
                 ),
                 onPressed: _login, // Memanggil fungsi _login saat tombol ditekan
                 child: const Text(

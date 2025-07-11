@@ -44,10 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
       // BottomNavBar untuk menampilkan tab
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF1B263B),
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.public), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.rocket_launch), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.travel_explore), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: ''),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
@@ -109,7 +111,7 @@ class _HomeContentState extends State<HomeContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Bagian Kabar dari MARS untuk API Images library NASA 
+            // Bagian Kabar dari MARS untuk API Images library NASA
             _buildSectionTitle('Kabar dari Mars'),
             _buildFeaturedImageSection(),
 
@@ -344,7 +346,7 @@ class _HomeContentState extends State<HomeContent> {
           return ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-             // Batasi jumlah item yang ditampilkan untuk performa
+            // Batasi jumlah item yang ditampilkan untuk performa
             itemCount: snapshot.data!.length > 10 ? 10 : snapshot.data!.length,
             itemBuilder: (context, index) {
               final item = snapshot.data![index];
