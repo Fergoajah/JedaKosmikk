@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF1B263B),
         showSelectedLabels: false,
         showUnselectedLabels: false,
+        // Icon 
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.rocket_launch), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.travel_explore), label: ''),
